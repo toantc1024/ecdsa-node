@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import server from "./server";
 
 function Transfer({ address, setBalance }) {
@@ -11,6 +11,10 @@ function Transfer({ address, setBalance }) {
     evt.preventDefault();
 
     try {
+      if (!address || !recipient || !sendAmount) {
+        throw new Error("Please fill address, recipient or amount");
+      }
+
       const {
         data: { balance },
       } = await server.post(`send`, {
@@ -20,7 +24,7 @@ function Transfer({ address, setBalance }) {
       });
       setBalance(balance);
     } catch (ex) {
-      alert(ex.response.data.message);
+      alert(ex.response.data.message || ex.message);
     }
   }
 
@@ -40,7 +44,7 @@ function Transfer({ address, setBalance }) {
       <label>
         Recipient
         <input
-          placeholder="Type an address, for example: 0x2"
+          placeholder="Type an address, for example: 0x2dc2"
           value={recipient}
           onChange={setValue(setRecipient)}
         ></input>

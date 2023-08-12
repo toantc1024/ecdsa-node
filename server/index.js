@@ -7,19 +7,32 @@ app.use(cors());
 app.use(express.json());
 
 const balances = {
-  "0x1": 100,
-  "0x2": 50,
-  "0x3": 75,
+  "0x4eb2e322f339db2eab9899618ee0140456068539": 100,
+  "0x00de8b294f6368a0fc346488834e578a1855aadb": 50,
+  "0xb73da6799c06d085dc3a109e7712634bd2e82e2b": 75,
+};
+
+const error = {
+  NO_ADDRESS: "Sender/Recipient address shouldn't be empty",
 };
 
 app.get("/balance/:address", (req, res) => {
   const { address } = req.params;
+  console.log(address);
   const balance = balances[address] || 0;
   res.send({ balance });
 });
 
 app.post("/send", (req, res) => {
-  const { sender, recipient, amount } = req.body;
+  // Todo: Get a signature from the client-side application
+  // recover the public address from the signature
+  const { signature, publicKey, sender, recipient, amount } = req.body;
+
+  if (!sender || !recipient) {
+    res.status(400).send({ message: error.NO_ADDRESS });
+  }
+
+  console.log("Received", { signature, publicKey });
 
   setInitialBalance(sender);
   setInitialBalance(recipient);
